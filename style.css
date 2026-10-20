@@ -28,6 +28,11 @@ body{
     text-align: right;
     font-size: 25px;
 }
+#showing{
+    font-family: roboto;
+    display: flex;
+    letter-spacing: 2px;
+}
 .botoes{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
