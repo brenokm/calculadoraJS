@@ -1,9 +1,9 @@
-/* factory function retorna objetos */
 function criarCalculadora() {
     return {
         display: document.querySelector('#display'),
         showing: document.querySelector('#showing'),
         btnClear: document.querySelector('.btn-clear'),
+        calculated: false,
 
         start() {
             this.clickButtons()
@@ -12,18 +12,16 @@ function criarCalculadora() {
 
         clickButtons() {
             const math = ['+', '-', '*', '/', '='];
-
             document.addEventListener('click', e => {
                 const el = e.target;
                 if (math.includes(el.innerText)) return this.showingValues(el.innerText);
-                //if ((el.classList.contains('right') || el.classList.contains('point')) && !this.display.value) return;
                 if (el.classList.contains('btn-num')) this.displayValues(el.innerText);
                 if (el.classList.contains('btn-clear')) this.clearAll();
                 if (el.classList.contains('btn-del')) this.deleteOne();
-                if (el.classList.contains('btn-equals')) this.equal();
+                if (el.classList.contains('btn-equals')) this.count();
             })
-
         },
+
         enter() {
             this.display.addEventListener('input', () => {
                 this.display.value = this.display.value.replace(/[^0-9+\-*/().]/g, ''); /*REGEX*/
@@ -43,35 +41,59 @@ function criarCalculadora() {
         },
 
         displayValues(value) {
+            if(!this.display.value &&  value ==='.' ) return
+            if(this.display.value.split('.').length - 1 > 0 && value === '.')return
+            console.log(this.display.value.split('.').length);
+            if (this.display.value.endsWith('.') && value === '.') return
             this.display.value += value;
         },
 
         showingValues(value) {
-            if (value === '=') {
-                this.showing.innerText += this.display.value;
+            const math = ['+', '-', '*', '/'];
+            const showing = this.showing.innerText;
+            const display = this.display.value;
+
+            if (this.calculated && math.includes(value)) {
+                this.showing.innerText = display + value;
                 this.display.value = '';
-                this.count(this.showing.innerText)
+                this.calculated = false;
+                return;
+            }
+            if (!showing && !display && (value === '*' || value === '/')) return;
+            if (math.some(op => showing.endsWith(op)) && math.includes(value)) {
+                if (!display) {
+                    this.showing.innerText = showing.slice(0, -1);
+                    this.showing.innerText += value;
+                    return;
+                }
+            }
+            if (value === '=') {
+                if (showing.includes('(') && !showing.includes(')')) {
+                    this.showing.innerText += display + ')';
+                    this.count(this.showing.innerText);
+                    return
+
+                }
+                this.showing.innerText += display;
+                this.count(this.showing.innerText);
                 return;
             }
             this.showing.innerText += this.display.value + value;
-            this.display.value = ''
+            this.display.value = '';
         },
 
         count(value) {
-
             try {
-                count = value
-                count = eval(count)
-                this.display.value = count
-                
+                const result = eval(value || this.showing.innerText);
+                this.display.value = result;
+                this.calculated = true;
             } catch (error) {
-                alert("conta inválida")
+                alert('Conta inválida');
+                this.showing.innerText = '';
+                this.display.value = '';
+
             }
-
-        }
-
-
-
+        },
     }
 }
 
