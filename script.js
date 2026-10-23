@@ -41,18 +41,26 @@ function criarCalculadora() {
         },
 
         displayValues(value) {
-            if(!this.display.value &&  value ==='.' ) return
-            if(this.display.value.split('.').length - 1 > 0 && value === '.')return
-            console.log(this.display.value.split('.').length);
+            const math = ['+', '-', '*', '/'];
+            let showing = this.showing.innerText;
+            let display = this.display.value;
+
+           
+            if (display !== '' && value === '(' && !math.some(op => display.endsWith(op))) {
+                this.display.value += '*';
+            }
+            if (!this.display.value && value === '.') return
+            if (this.display.value.split('.').length - 1 > 0 && value === '.') return
+           
             if (this.display.value.endsWith('.') && value === '.') return
             this.display.value += value;
         },
 
         showingValues(value) {
             const math = ['+', '-', '*', '/'];
-            const showing = this.showing.innerText;
-            const display = this.display.value;
-
+            let showing = this.showing.innerText;
+            let display = this.display.value;
+            if (display.endsWith('(') && math.includes(value)) return;
             if (this.calculated && math.includes(value)) {
                 this.showing.innerText = display + value;
                 this.display.value = '';
